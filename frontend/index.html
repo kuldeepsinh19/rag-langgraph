@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG System - Document Q&A</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 RAG Document Q&A System</h1>
+            <p class="subtitle">Upload documents and ask questions</p>
+        </header>
+
+        <!-- Status Indicator -->
+        <div id="statusIndicator" class="status-indicator">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Checking connection...</span>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Upload Section -->
+            <section class="card">
+                <h2>📤 Upload Document</h2>
+                <p class="help-text">Supported formats: PDF, DOCX, DOC, XLSX, TXT (max 20MB)</p>
+                
+                <form id="uploadForm">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.xlsx,.txt" required>
+                        <label for="fileInput" class="file-label">
+                            <span id="fileLabel">Choose a file...</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="uploadBtn">
+                        <span class="btn-text">Upload & Process</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+
+                <div id="uploadStatus" class="status-message"></div>
+            </section>
+
+            <!-- Documents List -->
+            <section class="card">
+                <div class="section-header">
+                    <h2>📚 Uploaded Documents</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="refreshDocuments()">
+                        🔄 Refresh
+                    </button>
+                </div>
+                
+                <div id="documentsList" class="documents-list">
+                    <p class="loading-text">Loading documents...</p>
+                </div>
+            </section>
+
+            <!-- Query Section -->
+            <section class="card">
+                <h2>💬 Ask a Question</h2>
+                <p class="help-text">Ask anything about your uploaded documents</p>
+                
+                <form id="queryForm">
+                    <textarea 
+                        id="queryInput" 
+                        placeholder="What is this document about?" 
+                        rows="3"
+                        required
+                    ></textarea>
+
+                    <button type="submit" class="btn btn-primary" id="queryBtn">
+                        <span class="btn-text">Ask Question</span>
+                        <span class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
+
+                <div id="queryStatus" class="status-message"></div>
+            </section>
+
+            <!-- Answer Section -->
+            <section class="card" id="answerSection" style="display: none;">
+                <h2>💡 Answer</h2>
+                <div id="answerContent" class="answer-content"></div>
+                
+                <div id="sourcesSection" style="margin-top: 20px;">
+                    <h3>📎 Sources</h3>
+                    <div id="sourcesList" class="sources-list"></div>
+                </div>
+
+                <div id="metadataSection" class="metadata">
+                    <small>
+                        <strong>Query:</strong> <span id="finalQuery"></span><br>
+                        <strong>Rewrites:</strong> <span id="rewriteCount"></span>
+                    </small>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>RAG LangGraph System • Made with TypeScript, LangGraph.js & Ollama</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

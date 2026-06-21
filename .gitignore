@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime/cache files
+.cache/
+.tmp/
+tmp/
+temp/
+uploads/
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TypeScript incremental cache
+*.tsbuildinfo
+
+# Local scratch/request files
+query.json
+

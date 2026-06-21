@@ -1,0 +1,1 @@
+export { routeAfterGrade } from './routeAfterGrade';

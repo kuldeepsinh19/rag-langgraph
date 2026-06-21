@@ -1,0 +1,14 @@
+Introduction to Artificial Intelligence
+
+Artificial Intelligence (AI) is the simulation of human intelligence by machines. It involves creating computer systems that can perform tasks typically requiring human intelligence, such as visual perception, speech recognition, decision-making, and language translation.
+
+Machine Learning is a subset of AI that enables systems to learn from data and improve their performance over time without being explicitly programmed. Deep Learning, a further subset, uses neural networks with multiple layers to process complex patterns in large amounts of data.
+
+Key Applications of AI:
+- Natural Language Processing: Understanding and generating human language
+- Computer Vision: Interpreting visual information from images and videos
+- Robotics: Automating physical tasks
+- Expert Systems: Making decisions in specialized domains
+- Autonomous Vehicles: Self-driving cars and drones
+
+The future of AI promises transformative changes across industries including healthcare, finance, education, and transportation.

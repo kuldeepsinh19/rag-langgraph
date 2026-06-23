@@ -76,8 +76,8 @@ async function initDatabase() {
 
     console.log('\n✅ Database initialization complete!');
     console.log('\n📋 Next steps:');
-    console.log('   1. Start Ollama and pull models:');
-    console.log('      docker exec -it rag-langgraph-ollama-1 ollama pull nomic-embed-text');
+    console.log('   1. Configure Gemini embeddings with GEMINI_API_KEY');
+    console.log('   2. Start Ollama and pull the LLM model:');
     console.log('      docker exec -it rag-langgraph-ollama-1 ollama pull llama3.2');
     console.log('   2. Start the server:');
     console.log('      npm run dev');

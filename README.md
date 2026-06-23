@@ -1,6 +1,6 @@
 # RAG System with LangGraph.js
 
-A production-ready Retrieval-Augmented Generation (RAG) system built with TypeScript, LangGraph.js, Express, PostgreSQL (pgvector), and Qdrant.
+A production-ready Retrieval-Augmented Generation (RAG) system built with TypeScript, LangGraph.js, Express, Gemini embeddings, PostgreSQL (pgvector), and Qdrant.
 
 ## Quick Start
 
@@ -8,6 +8,7 @@ A production-ready Retrieval-Augmented Generation (RAG) system built with TypeSc
 - Node.js 22.10+
 - Docker & Docker Compose
 - npm 10+
+- Google Gemini API key for embeddings
 
 ### 1. Install Dependencies
 ```bash
@@ -32,7 +33,7 @@ npm run db:init
 
 ### 4. Pull LLM Model (Ollama)
 ```bash
-docker exec -it rag-langgraph-ollama-1 ollama pull mistral
+docker exec -it rag-langgraph-ollama-1 ollama pull llama3.2
 ```
 
 ### 5. Set Environment Variables
@@ -42,13 +43,18 @@ Create `.env` file in project root:
 DATABASE_URL=postgres://raguser:ragpass@localhost:5432/ragdb
 
 # Vector Store (pgvector or qdrant)
-VECTOR_STORE=qdrant
+VECTOR_STORE=pgvector
 QDRANT_URL=http://localhost:6333
 
 # Embeddings & LLM
-EMBEDDINGS_MODEL=nomic-embed-text
-LLM_MODEL=mistral
+EMBEDDER_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_EMBED_MODEL=gemini-embedding-2
+GEMINI_EMBED_DIMENSIONS=768
+GEMINI_EMBED_CONCURRENCY=1
+GEMINI_EMBED_DELAY_MS=1000
 OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_LLM_MODEL=llama3.2
 
 # API
 PORT=3000
@@ -61,6 +67,13 @@ MAX_FILE_SIZE_MB=20
 MAX_REWRITE_RETRIES=2
 MIN_RELEVANCE_SCORE=0.5
 ```
+
+Validate Gemini embeddings after adding your real key:
+```bash
+npm run gemini:validate
+```
+
+If this project already contains Ollama-generated vectors, clear them before re-ingesting documents. For pgvector, delete existing rows from `chunks`; for Qdrant, recreate the collection. Do not mix Ollama and Gemini embeddings in the same vector store.
 
 ### 6. Run Development Server
 ```bash
@@ -286,13 +299,22 @@ All configuration is validated at startup with Zod. See `src/common/config.ts` f
 | `PORT` | 3000 | Server port |
 | `LOG_LEVEL` | info | Pino log level |
 | `DATABASE_URL` | - | PostgreSQL connection string |
-| `VECTOR_STORE` | qdrant | pgvector or qdrant |
+| `VECTOR_STORE` | pgvector | pgvector or qdrant |
 | `QDRANT_URL` | http://localhost:6333 | Qdrant endpoint |
-| `EMBEDDINGS_MODEL` | nomic-embed-text | Ollama embedding model |
-| `LLM_MODEL` | mistral | Ollama LLM model |
+| `EMBEDDER_PROVIDER` | gemini | gemini or ollama |
+| `GEMINI_API_KEY` | - | Gemini API key for embeddings |
+| `GEMINI_EMBED_MODEL` | gemini-embedding-2 | Gemini embedding model |
+| `GEMINI_EMBED_DIMENSIONS` | 768 | Gemini output dimensions |
+| `GEMINI_EMBED_CONCURRENCY` | 1 | Concurrent Gemini embedding requests |
+| `GEMINI_EMBED_DELAY_MS` | 1000 | Delay between Gemini embedding requests per worker |
+| `GEMINI_EMBED_MAX_RETRIES` | 3 | Retries for transient Gemini quota/rate-limit responses |
+| `OLLAMA_LLM_MODEL` | llama3.2 | Ollama LLM model |
 | `OLLAMA_BASE_URL` | http://localhost:11434 | Ollama endpoint |
 | `MAX_FILE_SIZE_MB` | 20 | File upload limit |
 | `MAX_REWRITE_RETRIES` | 2 | Query rewrite attempts |
+| `MAX_CONTEXT_CHARS` | 12000 | Max retrieved context sent to the LLM |
+| `MAX_CHUNKS_PER_DOCUMENT` | 500 | Ingestion guardrail for oversized documents |
+| `INGEST_EMBED_BATCH_SIZE` | 25 | Number of chunks processed per ingestion batch |
 | `MIN_RELEVANCE_SCORE` | 0.5 | Vector search threshold |
 | `TOP_K` | 5 | Default documents to retrieve |
 

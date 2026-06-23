@@ -1,7 +1,7 @@
 import { Ollama } from 'ollama';
 import { logger } from '../common/logger';
 import { VectorStoreError } from '../common/errors';
-import type { IEmbeddingService } from './IEmbeddingService';
+import type { EmbedBatchOptions, IEmbeddingService } from './IEmbeddingService';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 400;
@@ -52,7 +52,7 @@ export class OllamaEmbedder implements IEmbeddingService {
     throw new Error('Embedding request failed after retries');
   }
 
-  async embedBatch(texts: string[]): Promise<number[][]> {
+  async embedBatch(texts: string[], _options: EmbedBatchOptions = {}): Promise<number[][]> {
     const embeddings = new Array<number[]>(texts.length);
     let nextIndex = 0;
 

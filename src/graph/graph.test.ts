@@ -9,7 +9,13 @@ import { buildRagGraph } from './ragGraph';
 const baseConfig: Config = {
   DATABASE_URL: 'postgres://user:pass@localhost:5432/ragdb',
   VECTOR_STORE: 'pgvector',
-  EMBEDDER_PROVIDER: 'ollama',
+  EMBEDDER_PROVIDER: 'gemini',
+  GEMINI_API_KEY: 'test-key',
+  GEMINI_EMBED_MODEL: 'gemini-embedding-2',
+  GEMINI_EMBED_DIMENSIONS: 768,
+  GEMINI_EMBED_CONCURRENCY: 1,
+  GEMINI_EMBED_DELAY_MS: 0,
+  GEMINI_EMBED_MAX_RETRIES: 0,
   OLLAMA_BASE_URL: 'http://localhost:11434',
   OLLAMA_EMBED_MODEL: 'nomic-embed-text',
   OLLAMA_LLM_MODEL: 'llama3.2',
@@ -20,6 +26,9 @@ const baseConfig: Config = {
   TOP_K: 3,
   MIN_RELEVANCE_SCORE: 0.7,
   MAX_REWRITE_RETRIES: 2,
+  MAX_CONTEXT_CHARS: 12000,
+  MAX_CHUNKS_PER_DOCUMENT: 500,
+  INGEST_EMBED_BATCH_SIZE: 25,
   PORT: 3000,
   LOG_LEVEL: 'error',
   MAX_FILE_SIZE_MB: 20,
@@ -259,5 +268,44 @@ describe('RAG graph', () => {
     expect(result.answer).toContain('This document appears to be about');
     expect(result.answer).not.toContain('asonable');
     expect(result.answer).toContain('medical coverage and leave policy');
+  });
+
+  it('formats table-like fallback answers as structured bullets', async () => {
+    const source = chunk(
+      'chunk-8',
+      'Aspire Program helps learners build job-ready programming skills over two months.\nSecond Month ,,,,,, Programming Fundamentals & Basics of Javascript,,,,,, ,,,,,, ,,,,,, Week,Day,Activity Type,Knowledge Area,Topic,Mentor Name,Description 5,1,Session,Prograaming Fundamentals,What is program? Compilation vs Interpretation,Vivek,"What is Program & Programming"',
+      0.97,
+    );
+    const llm = {
+      invoke: vi.fn(async () => {
+        throw new Error('LLM timeout after 12000ms');
+      }),
+    };
+    const { deps } = createDeps({
+      chunksByRetrieve: [[source]],
+      llmResponse: () => 'unused',
+    });
+
+    const graph = buildRagGraph({ ...deps, llm });
+    const result = await graph.invoke({ query: 'explain about aspire program' });
+
+    expect(result.answer).toContain('Based on the document:');
+    expect(result.answer).toContain('- Aspire Program helps learners build job-ready programming skills');
+    expect(result.answer).not.toContain(',,,,');
+    expect(result.answer).not.toContain('Week,Day,Activity Type');
+  });
+
+  it('normalizes noisy generated answers without changing comma lists', async () => {
+    const source = chunk('chunk-9', 'The Aspire Program teaches JavaScript, mentoring, and projects.', 0.95);
+    const { deps } = createDeps({
+      chunksByRetrieve: [[source]],
+      llmResponse: () =>
+        'Answer: The ASPIRE Program teaches JavaScript, mentoring, and projects.,,,,,\nThe ASPIRE Program teaches JavaScript, mentoring, and projects.',
+    });
+
+    const graph = buildRagGraph(deps);
+    const result = await graph.invoke({ query: 'explain about aspire program' });
+
+    expect(result.answer).toBe('The Aspire Program teaches JavaScript, mentoring, and projects.');
   });
 });

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS chunks (
   filename    TEXT NOT NULL,
   chunk_index INTEGER NOT NULL,
   text        TEXT NOT NULL,
-  embedding   vector(768),  -- nomic-embed-text produces 768-dim vectors
+  embedding   vector(768),  -- Gemini embeddings are configured to 768 dimensions
   page_number INTEGER,
   sheet_name  TEXT,
   created_at  TIMESTAMPTZ DEFAULT NOW()
@@ -14,3 +14,4 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 CREATE INDEX IF NOT EXISTS chunks_document_id_idx ON chunks(document_id);
 CREATE INDEX IF NOT EXISTS chunks_embedding_idx ON chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+CREATE INDEX IF NOT EXISTS chunks_text_fts_idx ON chunks USING gin (to_tsvector('english', text));

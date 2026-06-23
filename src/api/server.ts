@@ -58,7 +58,10 @@ const embedder = createEmbedder(config);
 const vectorStore = createVectorStore(config, embedder.dimensions);
 const chunker = createChunker(config);
 const docRepo = new PgDocumentRepository(pgPool);
-const ingestionService = new IngestionService(docRepo, vectorStore, embedder, chunker);
+const ingestionService = new IngestionService(docRepo, vectorStore, embedder, chunker, {
+  embedBatchSize: config.INGEST_EMBED_BATCH_SIZE,
+  maxChunksPerDocument: config.MAX_CHUNKS_PER_DOCUMENT,
+});
 const ragGraph = buildRagGraph({ vectorStore, embedder, config });
 
 logger.info('All services initialized');
@@ -105,7 +108,8 @@ app.get('/health', async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({
       status: 'ok',
       vectorStore: config.VECTOR_STORE,
-      embedder: 'ollama',
+      embedder: config.EMBEDDER_PROVIDER,
+      embeddingModel: embedder.model,
       services: { vectorStore: vectorStoreHealthy },
     });
   } catch (err) {

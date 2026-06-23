@@ -28,7 +28,7 @@ Make sure you've completed the setup:
 docker ps
 
 # Should show both models
-npm run ollama:validate
+npm run gemini:validate
 ```
 
 If not done yet, run:
@@ -307,7 +307,8 @@ npm run setup
 Before starting work:
 
 - [ ] Docker running: `docker ps` shows 3 containers
-- [ ] Ollama models: `npm run ollama:validate` passes
+- [ ] Gemini embeddings: `npm run gemini:validate` passes
+- [ ] Ollama LLM model is pulled with `docker exec -it rag-langgraph-ollama-1 ollama pull llama3.2`
 - [ ] Backend starts: `npm run dev` shows "Server started"
 - [ ] Frontend accessible: http://localhost:8080 opens
 - [ ] Status indicator: Green dot at top of page

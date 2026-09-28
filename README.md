@@ -33,7 +33,7 @@ npm run db:init
 
 ### 4. Pull LLM Model (Ollama)
 ```bash
-docker compose exec ollama ollama pull llama3.2
+docker exec -it rag-langgraph-ollama-1 ollama pull llama3.2
 ```
 
 ### 5. Set Environment Variables
@@ -365,7 +365,7 @@ Error: connect ECONNREFUSED 127.0.0.1:5432
 ```
 Error: model not found
 ```
-→ Pull model: `docker compose exec ollama ollama pull <model-name>`
+→ Pull model: `docker exec -it rag-langgraph-ollama-1 ollama pull <model-name>`
 
 ### Vector Store Health Check Fails
 ```
